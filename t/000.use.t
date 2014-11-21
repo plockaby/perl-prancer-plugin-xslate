@@ -6,7 +6,7 @@ use warnings FATAL => 'all';
 use Test::More;
 
 BEGIN {
-    use_ok('Prancer::Plugin::Template::Text::XSlate');
+    use_ok('Prancer::Plugin::Xslate');
 };
 
 done_testing();

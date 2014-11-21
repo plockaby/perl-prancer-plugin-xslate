@@ -1,5 +1,5 @@
 {
-   "abstract" : "A lightweight PSGI framework - Template Plugin - Text::XSlate",
+   "abstract" : "A lightweight PSGI framework - Template Plugin - Text::Xslate",
    "author" : [
       "Paul Lockaby <plockaby AT cpan DOT org>"
    ],
@@ -12,7 +12,7 @@
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : "2"
    },
-   "name" : "prancer-plugin-template-text-xslate",
+   "name" : "Prancer::Plugin::Xslate",
    "no_index" : {
       "directory" : [
          "t",
@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "Prancer" : "1.00",
-            "Text::XSlate" : "0",
+            "Text::Xslate" : "0",
             "Try::Tiny" : "0",
             "perl" : "5.010"
          }

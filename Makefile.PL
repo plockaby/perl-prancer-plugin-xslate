@@ -6,12 +6,12 @@ use warnings FATAL => 'all';
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-    'NAME'          => 'prancer-plugin-template-text-xslate',
+    'NAME'          => 'Prancer::Plugin::Xslate',
     'AUTHOR'        => 'Paul Lockaby <plockaby AT cpan DOT org>',
-    'VERSION_FROM'  => 'lib/Prancer/Plugin/Template/Text/XSlate.pm',
+    'VERSION_FROM'  => 'lib/Prancer/Plugin/Xslate.pm',
     'PREREQ_PM'     => {
         'Prancer'      => '1.00',
-        'Text::XSlate' => '0',
+        'Text::Xslate' => '0',
         'Try::Tiny'    => '0',
         'perl'         => '5.010',  # because "//" is used
     },

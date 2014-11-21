@@ -1,5 +1,5 @@
 ---
-abstract: A lightweight PSGI framework - Template Plugin - Text::XSlate
+abstract: A lightweight PSGI framework - Template Plugin - Text::Xslate
 author:
   - 'Paul Lockaby <plockaby AT cpan DOT org>'
 build_requires:
@@ -12,14 +12,14 @@ license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
-name: prancer-plugin-template-text-xslate
+name: Prancer::Plugin::Xslate
 no_index:
   directory:
     - t
     - inc
 requires:
   Prancer: 1.00
-  Text::XSlate: 0
+  Text::Xslate: 0
   Try::Tiny: 0
   perl: 5.010
 version: 1.00
