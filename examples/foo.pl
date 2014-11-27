@@ -62,7 +62,7 @@ sub handler {
 	my ($self, $env, $request, $response, $session) = @_;
 
     sub (GET + /) {
-        $response->header("Content-Type" => "text/plain");
+        $response->header("Content-Type" => "text/html");
         $response->body(render("foobar.tx"));
         return $response->finalize(200);
     }
