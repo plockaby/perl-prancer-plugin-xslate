@@ -9,6 +9,10 @@ our $VERSION = '0.990001';
 use Prancer::Plugin;
 use parent qw(Prancer::Plugin Exporter);
 
+# used to merge config values into the template
+use Prancer qw(config);
+
+use Hash::Merge::Simple;
 use Text::Xslate;
 use Try::Tiny;
 use Carp;
@@ -71,7 +75,7 @@ sub add_module {
 }
 
 sub _render {
-    my $self = shift;
+    my ($self, $template, $vars) = @_;
 
     # just pass all of the options directly to Text::Xslate
     # some default options that are important to remember:
@@ -82,7 +86,12 @@ sub _render {
     #    syntax    = 'Kolon'
     #    type      = 'html' (identical to xml)
     my $tx = Text::Xslate->new(%{$self->{'_config'}});
-    return $tx->render(@_);
+
+    # merge configuration values into the template variable list
+    my $config = config();
+    $vars = Hash::Merge::Simple->merge({ 'config' => $config }, $vars);
+
+    return $tx->render($template, $vars);
 }
 
 sub mark_raw {
