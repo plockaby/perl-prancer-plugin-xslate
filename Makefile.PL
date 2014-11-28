@@ -10,10 +10,11 @@ WriteMakefile(
     'AUTHOR'        => 'Paul Lockaby <plockaby AT cpan DOT org>',
     'VERSION_FROM'  => 'lib/Prancer/Plugin/Xslate.pm',
     'PREREQ_PM'     => {
-        'Prancer'      => '1.00',
-        'Text::Xslate' => '0',
-        'Try::Tiny'    => '0',
-        'perl'         => '5.010',  # because "//" is used
+        'Prancer'             => '1.00',
+        'Text::Xslate'        => '0',
+        'Try::Tiny'           => '0',
+        'Hash::Merge::Simple' => '0',
+        'perl'                => '5.010',  # because "//" is used
     },
     'INSTALLDIRS'   => (($] < 5.011) ? 'perl' : 'site'),
 
