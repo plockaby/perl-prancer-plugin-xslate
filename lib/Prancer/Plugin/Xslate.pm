@@ -4,7 +4,7 @@ use strict;
 use warnings FATAL => 'all';
 
 use version;
-our $VERSION = '0.990002';
+our $VERSION = '0.990003';
 
 use Prancer::Plugin;
 use parent qw(Prancer::Plugin Exporter);

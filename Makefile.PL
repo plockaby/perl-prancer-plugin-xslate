@@ -10,7 +10,7 @@ WriteMakefile(
     'AUTHOR'        => 'Paul Lockaby <plockaby AT cpan DOT org>',
     'VERSION_FROM'  => 'lib/Prancer/Plugin/Xslate.pm',
     'PREREQ_PM'     => {
-        'Prancer'             => '1.00',
+        'Prancer'             => '0.990003',
         'Text::Xslate'        => '0',
         'Try::Tiny'           => '0',
         'perl'                => '5.010',  # because "//" is used
