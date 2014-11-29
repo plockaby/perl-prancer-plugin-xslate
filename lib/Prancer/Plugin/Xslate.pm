@@ -4,7 +4,7 @@ use strict;
 use warnings FATAL => 'all';
 
 use version;
-our $VERSION = '0.990001';
+our $VERSION = '0.990002';
 
 use Prancer::Plugin;
 use parent qw(Prancer::Plugin Exporter);
@@ -12,7 +12,6 @@ use parent qw(Prancer::Plugin Exporter);
 # used to merge config values into the template
 use Prancer qw(config);
 
-use Hash::Merge::Simple;
 use Text::Xslate;
 use Try::Tiny;
 use Carp;
@@ -88,8 +87,8 @@ sub _render {
     my $tx = Text::Xslate->new(%{$self->{'_config'}});
 
     # merge configuration values into the template variable list
-    my $config = config();
-    $vars = Hash::Merge::Simple->merge({ 'config' => $config }, $vars);
+    my $config = config->get();
+    $vars = merge({ 'config' => $config }, $vars);
 
     return $tx->render($template, $vars);
 }
@@ -120,6 +119,29 @@ sub uri_escape {
         shift : (defined($_[0]) && $_[0] eq __PACKAGE__) ?
         bless({}, shift) : bless({}, __PACKAGE__);
     return Text::Xslate::uri_escape(@_);
+}
+
+# stolen from Hash::Merge::Simple
+sub merge {
+    my ($left, @right) = @_;
+
+    return $left unless @right;
+    return merge($left, merge(@right)) if @right > 1;
+
+    my ($right) = @right;
+    my %merged = %{$left};
+
+    for my $key (keys %{$right}) {
+        my ($hr, $hl) = map { ref($_->{$key}) eq "HASH" } $right, $left;
+
+        if ($hr and $hl) {
+            $merged{$key} = merge($left->{$key}, $right->{$key});
+        } else {
+            $merged{$key} = $right->{$key};
+        }
+    }
+
+    return \%merged;
 }
 
 1;
