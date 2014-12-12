@@ -4,14 +4,12 @@ use strict;
 use warnings FATAL => 'all';
 
 use version;
-our $VERSION = '0.990003';
+our $VERSION = '1.00';
 
 use Prancer::Plugin;
 use parent qw(Prancer::Plugin Exporter);
 
-# used to merge config values into the template
-use Prancer qw(config);
-
+use Prancer::Core;
 use Text::Xslate;
 use Try::Tiny;
 use Carp;
@@ -35,6 +33,9 @@ sub load {
         no strict 'refs';
         no warnings 'redefine';
         *{"${\__PACKAGE__}::render"} = sub {
+            my $this = ref($_[0]) && $_[0]->isa(__PACKAGE__) ?
+                shift : (defined($_[0]) && $_[0] eq __PACKAGE__) ?
+                bless({}, shift) : bless({}, __PACKAGE__);
             return $self->_render(@_);
         };
     }
@@ -45,36 +46,13 @@ sub load {
 sub path {
     my $self = shift;
     if (@_) {
-        $self->{'_config'}->{'path'} ||= [];
-        push(@{$self->{'_config'}->{'path'}}, @_);
+        $self->{'_config'}->{'path'} = shift;
     }
     return $self->{'_config'}->{'path'};
 }
 
-sub add_function {
-    my ($self, $key, $value) = @_;
-
-    # $value should be a coderef
-    # add $value as a function to the template engine to be called using $key
-    $self->{'_config'}->{'function'} ||= {};
-    $self->{'_config'}->{'function'}->{$key} = $value;
-
-    return;
-}
-
-sub add_module {
-    my ($self, $key, $value) = @_;
-
-    # $key should be the name of the module
-    # $value should be the what to import, if anything
-    $self->{'_config'}->{'module'} ||= [];
-    push(@{$self->{'_config'}->{'module'}}, $key, $value || []);
-
-    return;
-}
-
 sub _render {
-    my ($self, $template, $vars) = @_;
+    my ($self, $template, $vars, $config) = @_;
 
     # just pass all of the options directly to Text::Xslate
     # some default options that are important to remember:
@@ -84,11 +62,12 @@ sub _render {
     #    suffix    = '.tx'
     #    syntax    = 'Kolon'
     #    type      = 'html' (identical to xml)
-    my $tx = Text::Xslate->new(%{$self->{'_config'}});
+    my $tx_config = _merge($self->{'_config'}, $config);
+    my $tx = Text::Xslate->new(%{$tx_config});
 
     # merge configuration values into the template variable list
-    my $config = config->get();
-    $vars = merge({ 'config' => $config }, $vars);
+    my $user_config = $self->config->get();
+    $vars = _merge({ 'config' => $user_config }, $vars);
 
     return $tx->render($template, $vars);
 }
@@ -122,11 +101,11 @@ sub uri_escape {
 }
 
 # stolen from Hash::Merge::Simple
-sub merge {
+sub _merge {
     my ($left, @right) = @_;
 
     return $left unless @right;
-    return merge($left, merge(@right)) if @right > 1;
+    return _merge($left, _merge(@right)) if @right > 1;
 
     my ($right) = @right;
     my %merged = %{$left};
@@ -135,7 +114,7 @@ sub merge {
         my ($hr, $hl) = map { ref($_->{$key}) eq "HASH" } $right, $left;
 
         if ($hr and $hl) {
-            $merged{$key} = merge($left->{$key}, $right->{$key});
+            $merged{$key} = _merge($left->{$key}, $right->{$key});
         } else {
             $merged{$key} = $right->{$key};
         }
@@ -152,10 +131,93 @@ Prancer::Plugin::Xslate
 
 =head1 SYNOPSIS
 
-TODO
+This plugin provides access to the L<Text::Xslate> templating engine for your
+L<Prancer> application and exports a keyword to access the configured engine.
 
-=head1 OPTIONS
+This template plugin supports setting the basic configuration in your Prancer
+application's configuration file. You can also configure all options at runtime
+using arguments to C<render>.
 
-TODO
+To set a configuration in your application's configuration file, begin the
+configuration block with C<template> and put all options underneath that. For
+example:
+
+    template:
+        cache_dir: /path/to/cache
+        verbose: 2
+
+Any option for Text::Xslate whose value can be expressed in a configuration
+file can be put into your application's configuration. Then using the template
+engine is as simple as this:
+
+    use Prancer::Plugin::Xslate qw(render);
+
+    my $plugin = Prancer::Plugin::Xslate->load();
+    $plugin->add_module("Data::Dumper");
+
+    print render("foobar.tx", \%vars);
+
+However, there are some configuration options that cannot be expressed in
+configuration files, especially the C<functions> option. So there is a second
+way to handle that.
+
+    print render("foobar.tx", \%vars, {
+        'function' => {
+            'md5_hex' => sub {
+                return Digest::MD5::md5_hex(@_);
+            }
+        }
+    });
+
+The optional third argument to C<render> can be a hashref with additional,
+overriding options for L<Text::Xslate>.
+
+=head1 METHODS
+
+=over
+
+=item path
+
+This will set the C<path> option for Text::Xslate to anything that Text::Xslate
+suports. Each call to this method will overwrite whatever the previous template
+path was. For example:
+
+    # sets template path to just /path/to/templates
+    $plugin->path('/path/to/templates');
+
+    # blows away /path/to/templates set previously and sets it to this arrayref
+    $plugin->path([ '/path/to/global-templates', '/path/to/local-templates' ]);
+
+    # blows away the arrayref set previously and sets it to this hashref
+    $plugin->path({
+        'foo.tx' => '<html><body><: $foo :><br/></body></html>',
+        'bar.tx' => 'Hello, <: $bar :>.',
+    });
+
+=item mark_raw, unmark_raw, html_escape, uri_escape
+
+Proxies access to the static functions of the same name provided in
+L<Text::Xslate>. These can all be called statically or an instance of the
+plugin and all will work just fine. All of these can also be exported on
+demand. For more information on how to use these functions, read the
+Text::Xslate documentation.
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright 2014 Paul Lockaby. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Prancer>
+=item L<Text::Xslate>
+
+=back
 
 =cut

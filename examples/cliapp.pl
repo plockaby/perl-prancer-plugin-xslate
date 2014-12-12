@@ -18,7 +18,7 @@ sub main {
 
     # in here we get to initialize things!
     my $plugin = Prancer::Plugin::Xslate->load();
-    $plugin->path($root;
+    $plugin->path($root);
     $plugin->add_function("baz", sub { return "barfoo"; });
     $plugin->add_module("Digest::SHA1", ['sha1_hex']);
     $plugin->add_module("Data::Dumper");

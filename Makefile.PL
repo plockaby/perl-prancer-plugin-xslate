@@ -10,7 +10,7 @@ WriteMakefile(
     'AUTHOR'        => 'Paul Lockaby <plockaby AT cpan DOT org>',
     'VERSION_FROM'  => 'lib/Prancer/Plugin/Xslate.pm',
     'PREREQ_PM'     => {
-        'Prancer'             => '0.990003',
+        'Prancer'             => '1.00',
         'Text::Xslate'        => '0',
         'Try::Tiny'           => '0',
         'perl'                => '5.010',  # because "//" is used
@@ -22,4 +22,3 @@ WriteMakefile(
     ((ExtUtils::MakeMaker->VERSION() gt '6.30') ?
         ('LICENSE'  => 'perl')         : ()),
 );
-
