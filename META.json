@@ -34,10 +34,10 @@
          "requires" : {
             "Prancer" : "1.00",
             "Text::Xslate" : "0",
-            "Try::Tiny" : "0",
+            "Try::Tiny" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.03"
+   "version" : "1.04"
 }
