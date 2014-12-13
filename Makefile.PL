@@ -13,7 +13,6 @@ WriteMakefile(
         'Prancer'             => '1.00',
         'Text::Xslate'        => '0',
         'Try::Tiny'           => '0',
-        'perl'                => '5.010',  # because "//" is used
     },
     'INSTALLDIRS'   => (($] < 5.011) ? 'perl' : 'site'),
 

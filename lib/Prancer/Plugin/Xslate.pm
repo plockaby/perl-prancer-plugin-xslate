@@ -4,7 +4,7 @@ use strict;
 use warnings FATAL => 'all';
 
 use version;
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use Prancer::Plugin;
 use parent qw(Prancer::Plugin Exporter);
@@ -25,7 +25,7 @@ sub load {
     my $self = bless({}, $class);
 
     # the config is modified and used every time "render" is called
-    $self->{'_config'} = $self->config->remove("template") || {};
+    $self->{'_config'} = $self->config->get("template") || {};
 
     # now export the keyword with a reference to $self
     {

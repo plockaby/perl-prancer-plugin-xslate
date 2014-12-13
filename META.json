@@ -35,10 +35,9 @@
             "Prancer" : "1.00",
             "Text::Xslate" : "0",
             "Try::Tiny" : "0",
-            "perl" : "5.010"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.00"
+   "version" : "1.01"
 }
