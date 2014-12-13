@@ -228,8 +228,13 @@ the same terms as Perl itself.
 
 =over
 
-=item L<Prancer>
-=item L<Text::Xslate>
+=item
+
+L<Prancer>
+
+=item
+
+L<Text::Xslate>
 
 =back
 
