@@ -16,6 +16,8 @@ no strict 'refs';
 # finds templates in "."
 {
     ${"Prancer::Core::_instance"} = undef;
+    ${"Prancer::Plugin::Xslate::_instance"} = undef;
+
     my $app = Prancer::Core->new('t/configs/simple.yml');
     my $plugin = Prancer::Plugin::Xslate->load();
 
@@ -26,6 +28,8 @@ no strict 'refs';
 # set a template path with a string
 {
     ${"Prancer::Core::_instance"} = undef;
+    ${"Prancer::Plugin::Xslate::_instance"} = undef;
+
     my $app = Prancer::Core->new('t/configs/simple.yml');
     my $plugin = Prancer::Plugin::Xslate->load();
     $plugin->path('t/templates');
@@ -37,6 +41,8 @@ no strict 'refs';
 # set a template path with an array
 {
     ${"Prancer::Core::_instance"} = undef;
+    ${"Prancer::Plugin::Xslate::_instance"} = undef;
+
     my $app = Prancer::Core->new('t/configs/simple.yml');
     my $plugin = Prancer::Plugin::Xslate->load();
     $plugin->path([ 't/templates1', 't/templates2' ]);
@@ -50,6 +56,8 @@ no strict 'refs';
 # set a template "path" with a hash
 {
     ${"Prancer::Core::_instance"} = undef;
+    ${"Prancer::Plugin::Xslate::_instance"} = undef;
+
     my $app = Prancer::Core->new('t/configs/simple.yml');
     my $plugin = Prancer::Plugin::Xslate->load();
     $plugin->path({
@@ -66,6 +74,8 @@ no strict 'refs';
 # add a module with no imports
 {
     ${"Prancer::Core::_instance"} = undef;
+    ${"Prancer::Plugin::Xslate::_instance"} = undef;
+
     my $app = Prancer::Core->new('t/configs/module-no-import.yml');
     my $plugin = Prancer::Plugin::Xslate->load();
 
@@ -76,6 +86,8 @@ no strict 'refs';
 # add a module with imports
 {
     ${"Prancer::Core::_instance"} = undef;
+    ${"Prancer::Plugin::Xslate::_instance"} = undef;
+
     my $app = Prancer::Core->new('t/configs/module-import.yml');
     my $plugin = Prancer::Plugin::Xslate->load();
 
@@ -86,6 +98,8 @@ no strict 'refs';
 # adding a function
 {
     ${"Prancer::Core::_instance"} = undef;
+    ${"Prancer::Plugin::Xslate::_instance"} = undef;
+
     my $app = Prancer::Core->new('t/configs/function.yml');
     my $plugin = Prancer::Plugin::Xslate->load();
 
@@ -95,6 +109,31 @@ no strict 'refs';
         }
     });
     is($output, "Hello, 37b51d194a7513e45b56f6524f2d51f2.\n");
+}
+
+# make sure we remember our settings
+{
+    ${"Prancer::Core::_instance"} = undef;
+    ${"Prancer::Plugin::Xslate::_instance"} = undef;
+
+    {
+        my $app = Prancer::Core->new('t/configs/simple.yml');
+        my $plugin = Prancer::Plugin::Xslate->load();
+        $plugin->path({ 'simple.tx' => 'Hello, <: $foo :>.' });
+
+        my $output = $plugin->render('simple.tx', { 'foo' => 'asdf' });
+        is($output, "Hello, asdf.");
+    }
+
+    {
+        my $app = Prancer::Core->new('t/configs/simple.yml');
+        my $plugin = Prancer::Plugin::Xslate->load();
+
+        # don't define the path the second time around
+
+        my $output = $plugin->render('simple.tx', { 'foo' => 'asdf' });
+        is($output, "Hello, asdf.");
+    }
 }
 
 done_testing();

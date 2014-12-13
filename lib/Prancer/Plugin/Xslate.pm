@@ -4,7 +4,7 @@ use strict;
 use warnings FATAL => 'all';
 
 use version;
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use Prancer::Plugin;
 use parent qw(Prancer::Plugin Exporter);
@@ -22,6 +22,18 @@ our @CARP_NOT = qw(Prancer Try::Tiny);
 
 sub load {
     my $class = shift;
+
+    # already got an object
+    return $class if ref($class);
+
+    # this is a singleton
+    my $instance = undef;
+    {
+        no strict 'refs';
+        $instance = \${"${class}::_instance"};
+        return $$instance if defined($$instance);
+    }
+
     my $self = bless({}, $class);
 
     # the config is modified and used every time "render" is called
@@ -40,6 +52,7 @@ sub load {
         };
     }
 
+    $$instance = $self;
     return $self;
 }
 
