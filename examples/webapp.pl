@@ -33,11 +33,7 @@ use warnings FATAL => 'all';
 
 use File::Basename ();
 
-# this loads all of the prancer components. by including ":initialize", this
-# module gets to implement ->initialize which will be called when the module is
-# created. by including ":handler", this module gets to implement ->handler
-# which will receive all PSGI calls.
-use Prancer qw(config :initialize :handler);
+use Prancer qw(config);
 
 # load the template plugin
 use Prancer::Plugin::Xslate qw(render);
@@ -51,9 +47,6 @@ sub initialize {
     # in here we get to initialize things!
     my $plugin = Prancer::Plugin::Xslate->load();
     $plugin->path($root);
-    $plugin->add_function("baz", sub { return "barfoo"; });
-    $plugin->add_module("Digest::SHA1", ['sha1_hex']);
-    $plugin->add_module("Data::Dumper");
 
     return;
 }
@@ -63,10 +56,19 @@ sub handler {
 
     sub (GET + /) {
         $response->header("Content-Type" => "text/html");
-        $response->body(render("foobar.tx"));
+        $response->body(render("foobar.tx", {
+            "foo" => "bar"
+        }, {
+            'function' => {
+                'baz' => sub { return "barfoo"; },
+            },
+            'module' => [
+                'Digest::SHA1' => ['sha1_hex'],
+                'Data::Dumper'
+            ]
+        }));
         return $response->finalize(200);
     }
 }
 
 1;
-

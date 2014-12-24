@@ -3,9 +3,9 @@
 use strict;
 use warnings FATAL => 'all';
 
-use Prancer qw(config);
-
 use File::Basename ();
+
+use Prancer::Core qw(config);
 use Prancer::Plugin::Xslate qw(render);
 
 sub main {
@@ -14,17 +14,22 @@ sub main {
 
     # this just returns a prancer object so we can get access to configuration
     # options and other awesome things like plugins.
-    my $app = Prancer->new("${root}/foobar.yml");
+    my $app = Prancer::Core->new("${root}/foobar.yml");
 
     # in here we get to initialize things!
     my $plugin = Prancer::Plugin::Xslate->load();
     $plugin->path($root);
-    $plugin->add_function("baz", sub { return "barfoo"; });
-    $plugin->add_module("Digest::SHA1", ['sha1_hex']);
-    $plugin->add_module("Data::Dumper");
 
     print render("foobar.tx", {
         "foo" => "bar"
+    }, {
+        'function' => {
+            'baz' => sub { return "barfoo"; },
+        },
+        'module' => [
+            'Digest::SHA1' => ['sha1_hex'],
+            'Data::Dumper'
+        ]
     });
 
     return;

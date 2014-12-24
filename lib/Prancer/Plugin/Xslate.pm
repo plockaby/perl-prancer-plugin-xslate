@@ -166,7 +166,6 @@ engine is as simple as this:
     use Prancer::Plugin::Xslate qw(render);
 
     my $plugin = Prancer::Plugin::Xslate->load();
-    $plugin->add_module("Data::Dumper");
 
     print render("foobar.tx", \%vars);
 
@@ -183,7 +182,8 @@ way to handle that.
     });
 
 The optional third argument to C<render> can be a hashref with additional,
-overriding options for L<Text::Xslate>.
+overriding options for L<Text::Xslate>. This is how you might go about adding
+support for functions and methods.
 
 =head1 METHODS
 
