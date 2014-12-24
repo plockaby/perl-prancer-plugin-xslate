@@ -7,3 +7,7 @@ Revision history for Perl extension Prancer::Plugin::Xslate
 	- Don't remove configuration after loading it once.
 	- Make a singleton so configurations are remembered.
 	- 1.01, 1.02, and 1.03 were screwed up releases
+
+1.05 Wed Dec 24 04:59:04 UTC 2014
+	- Fixing bad code in perl doc and examples
+
