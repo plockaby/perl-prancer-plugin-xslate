@@ -12,6 +12,18 @@ use Digest::MD5;
 # we are going to undef the Prancer::Core singleton over and over again
 no strict 'refs';
 
+# try running without any configuration whatsoever
+{
+    ${"Prancer::Core::_instance"} = undef;
+    ${"Prancer::Plugin::Xslate::_instance"} = undef;
+
+    my $app = Prancer::Core->new();
+    my $plugin = Prancer::Plugin::Xslate->load();
+
+    my $output = $plugin->render('t/templates/simple.tx', { 'foo' => 'bar' });
+    is($output, "<html><body>bar<br/></body></html>\n");
+}
+
 # basic test of functionality
 # finds templates in "."
 {

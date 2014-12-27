@@ -37,7 +37,7 @@ sub load {
     my $self = bless({}, $class);
 
     # the config is modified and used every time "render" is called
-    $self->{'_config'} = $self->config->get("template") || {};
+    $self->{'_config'} = ($self->config() && $self->config->get("template")) || {};
 
     # now export the keyword with a reference to $self
     {
@@ -79,7 +79,7 @@ sub _render {
     my $tx = Text::Xslate->new(%{$tx_config});
 
     # merge configuration values into the template variable list
-    my $user_config = $self->config->get();
+    my $user_config = ($self->config() && $self->config->get()) || {};
     $vars = _merge({ 'config' => $user_config }, $vars);
 
     return $tx->render($template, $vars);
