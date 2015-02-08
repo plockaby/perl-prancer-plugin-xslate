@@ -11,7 +11,6 @@ use parent qw(Prancer::Plugin Exporter);
 
 use Prancer::Core;
 use Text::Xslate;
-use Try::Tiny;
 use Carp;
 
 our @EXPORT_OK = qw(render mark_raw unmark_raw html_escape uri_escape);
