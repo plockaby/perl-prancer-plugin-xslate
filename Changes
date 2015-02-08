@@ -11,3 +11,5 @@ Revision history for Perl extension Prancer::Plugin::Xslate
 1.05 Wed Dec 24 04:59:04 UTC 2014
 	- Fixing bad code in perl doc and examples
 
+1.06 Sun Feb  8 07:19:59 UTC 2015
+	- Adding option to override configuration at template engine initialization.

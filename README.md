@@ -4,10 +4,8 @@ Prancer::Plugin::Xslate
 
 # SYNOPSIS
 
-This plugin provides access to the
-[Text::Xslate](https://metacpan.org/pod/Text::Xslate) templating engine for
-your [Prancer](https://metacpan.org/pod/Prancer) application and exports a
-keyword to access the configured engine.
+This plugin provides access to the [Text::Xslate](https://metacpan.org/pod/Text::Xslate) templating engine for your
+[Prancer](https://metacpan.org/pod/Prancer) application and exports a keyword to access the configured engine.
 
 This template plugin supports setting the basic configuration in your Prancer
 application's configuration file. You can also configure all options at runtime
@@ -27,14 +25,24 @@ engine is as simple as this:
 
     use Prancer::Plugin::Xslate qw(render);
 
-    my $plugin = Prancer::Plugin::Xslate->load();
-    $plugin->add_module("Data::Dumper");
+    Prancer::Plugin::Xslate->load();
 
     print render("foobar.tx", \%vars);
 
 However, there are some configuration options that cannot be expressed in
-configuration files, especially the `functions` option. So there is a second
-way to handle that.
+configuration files, especially the `functions` option. There are two
+additional ways to handle that. The first way is to pass them to the template
+plugin when loading it, like this:
+
+    Prancer::Plugin::Xslate->load({
+        'function' => {
+            'encode_json' => sub {
+                return JSON::encode_json(@_);
+            }
+        }
+    });
+
+The second way is to the optional third argument to `render`, like this:
 
     print render("foobar.tx", \%vars, {
         'function' => {
@@ -44,8 +52,10 @@ way to handle that.
         }
     });
 
-The optional third argument to `render` can be a hashref with additional,
-overriding options for [Text::Xslate](https://metacpan.org/pod/Text::Xslate).
+Options passed when initializing the template plugin will override options
+configured in the configuration file. Options passed when calling `render`
+will override options passed when initializing the template plugin. This is
+the way you might go about adding support for functions and methods.
 
 # METHODS
 
@@ -70,14 +80,14 @@ overriding options for [Text::Xslate](https://metacpan.org/pod/Text::Xslate).
 - mark\_raw, unmark\_raw, html\_escape, uri\_escape
 
     Proxies access to the static functions of the same name provided in
-    [Text::Xslate](https://metacpan.org/pod/Text::Xslate). These can all be
-    called statically or an instance of the plugin and all will work just fine.
-    All of these can also be exported on demand. For more information on how to
-    use these functions, read the Text::Xslate documentation.
+    [Text::Xslate](https://metacpan.org/pod/Text::Xslate). These can all be called statically or an instance of the
+    plugin and all will work just fine. All of these can also be exported on
+    demand. For more information on how to use these functions, read the
+    Text::Xslate documentation.
 
 # COPYRIGHT
 
-Copyright 2014 Paul Lockaby. All rights reserved.
+Copyright 2014, 2015 Paul Lockaby. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

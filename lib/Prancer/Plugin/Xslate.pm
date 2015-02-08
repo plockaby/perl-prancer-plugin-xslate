@@ -4,7 +4,7 @@ use strict;
 use warnings FATAL => 'all';
 
 use version;
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 use Prancer::Plugin;
 use parent qw(Prancer::Plugin Exporter);
@@ -21,7 +21,7 @@ our %EXPORT_TAGS = ('all' => [ @EXPORT_OK ]);
 our @CARP_NOT = qw(Prancer Try::Tiny);
 
 sub load {
-    my $class = shift;
+    my ($class, $config_override) = @_;
 
     # already got an object
     return $class if ref($class);
@@ -36,8 +36,11 @@ sub load {
 
     my $self = bless({}, $class);
 
-    # the config is modified and used every time "render" is called
-    $self->{'_config'} = ($self->config() && $self->config->get("template")) || {};
+    # merge together options from the configuration file ($config) with options
+    # given to this method ($options). later this set of configuration options
+    # will be merged with any options given to "render".
+    my $config = ($self->config() && $self->config->get("template"));
+    $self->{'_config'} = _merge($config || {}, $config_override || {});
 
     # now export the keyword with a reference to $self
     {
@@ -65,7 +68,7 @@ sub path {
 }
 
 sub _render {
-    my ($self, $template, $vars, $config) = @_;
+    my ($self, $template, $vars, $config_override) = @_;
 
     # just pass all of the options directly to Text::Xslate
     # some default options that are important to remember:
@@ -75,7 +78,7 @@ sub _render {
     #    suffix    = '.tx'
     #    syntax    = 'Kolon'
     #    type      = 'html' (identical to xml)
-    my $tx_config = _merge($self->{'_config'}, $config);
+    my $tx_config = _merge($self->{'_config'}, $config_override);
     my $tx = Text::Xslate->new(%{$tx_config});
 
     # merge configuration values into the template variable list
@@ -165,13 +168,24 @@ engine is as simple as this:
 
     use Prancer::Plugin::Xslate qw(render);
 
-    my $plugin = Prancer::Plugin::Xslate->load();
+    Prancer::Plugin::Xslate->load();
 
     print render("foobar.tx", \%vars);
 
 However, there are some configuration options that cannot be expressed in
-configuration files, especially the C<functions> option. So there is a second
-way to handle that.
+configuration files, especially the C<functions> option. There are two
+additional ways to handle that. The first way is to pass them to the template
+plugin when loading it, like this:
+
+    Prancer::Plugin::Xslate->load({
+        'function' => {
+            'encode_json' => sub {
+                return JSON::encode_json(@_);
+            }
+        }
+    });
+
+The second way is to the optional third argument to C<render>, like this:
 
     print render("foobar.tx", \%vars, {
         'function' => {
@@ -181,9 +195,10 @@ way to handle that.
         }
     });
 
-The optional third argument to C<render> can be a hashref with additional,
-overriding options for L<Text::Xslate>. This is how you might go about adding
-support for functions and methods.
+Options passed when initializing the template plugin will override options
+configured in the configuration file. Options passed when calling C<render>
+will override options passed when initializing the template plugin. This is
+the way you might go about adding support for functions and methods.
 
 =head1 METHODS
 
@@ -219,7 +234,7 @@ Text::Xslate documentation.
 
 =head1 COPYRIGHT
 
-Copyright 2014 Paul Lockaby. All rights reserved.
+Copyright 2014, 2015 Paul Lockaby. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
